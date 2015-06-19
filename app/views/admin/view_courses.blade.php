@@ -5,6 +5,7 @@
 @section('header')
     <?php
     $institute = Institute::find(Auth::user()->institute_id);
+    
     echo $institute->name;
     ?>
 @stop
@@ -30,7 +31,7 @@
     <div class="col-lg-6">
         <div class="panel panel-default">
             <div class="panel-heading">
-                {{$program->title}} Program Course List
+                {{$course->title}} Topics
             </div>
             <div class="panel-body">
                            
@@ -38,33 +39,23 @@
                     <table class="table table-striped table-bordered table-hover" id="dataTables-example">
                                     <thead>
                                         <tr>
-                                            <th>Course</th>
-                                         
-                                            <th>Department</th>
+                                            <th>Week</th>
+                                            <th>Topic</th>
                                             <th>Controls</th>
                                         </tr>
                                     </thead>
                                     <tbody>
 
-                                        @foreach($progcours as $progcour)
-                                        <?php
-                                        $course = Course::find($progcour->course_id);
-                                        $department = Department::find($course->department_id);
-                                        ?>
+                                        @foreach($topics as $topic)
+                                        
                                         <tr class="gradeA">
-                                            <td class="center"><a href="/curriculum/courses/{{$progcour->id}}">{{$course->title}}</a></td>
+                                            <td class="center">{{$topic->week_no}}</td>
 
-                                            <td class="center">{{$department->name}}</td>
+                                            <td class="center"><a href="/admin/topics/view/{{$topic->department_id}}">{{$topic->title}}</a></td>
                                  
                                             <td class="center">
-                                                <a href="/admin/programs/courses/settings/{{$progcour->id}}">
-
-                                                <button class="btn btn-primary" >Set Outcomes</button>
-                                                </a>  
-                                                <a href="/admin/progcours/edit/{{$progcour->id}}">
-                                                <button class="btn btn-primary" disabled ><i class="fa fa-pencil-square-o" ></i></button>
-                                                </a>  
-                                                <button class="btn btn-warning" type="button" data-toggle="modal" data-target="{{ '#delete_' . $progcour->id }}"  data-toggle="tooltip" data-placement="top"  title="Delete Course from Program" disabled><i class="fa fa-trash-o"></i></button>
+                                            
+                                                <button class="btn btn-warning" type="button" data-toggle="modal" data-target="{{ '#delete_' . $topic->id }}"  data-toggle="tooltip" data-placement="top"  title="Delete Topic" disabled><i class="fa fa-trash-o"></i></button>
                                             </td>
                                         </tr>
                                         @endforeach
@@ -72,23 +63,50 @@
                                        
                                     </tbody>
                     </table>
+
+
                 </div>
                             <!-- /.table-responsive -->
 
-                {{ Form::open(['role'=>'form','type' => 'POST', 'url' => '/admin/programs/add/course']) }}
-                                        
-                                        <div class="form-group @if($errors->has('courses')) has-error @endif">
-                                            <label>Add Courses:</label>
-                                            @if($errors->has('courses'))
-                                            <label class="control-label" for="inputError">{{ $errors->first('courses') }}</label>
+ 
+                {{ Form::open(['role'=>'form','type' => 'POST', 'url' => '/admin/courses/add/topic']) }}
+                                        <div class="form-group @if($errors->has('title')) has-error @endif">
+                                            <label>Add Topic:</label>
+                                            @if($errors->has('title'))
+                                            <label class="control-label" for="inputError">{{ $errors->first('title') }}</label>
                                             @endif
-                                            <select data-placeholder="Select courses to add" style="width:350px;"  multiple class="chosen-select" tabindex="12" name="courses[]">
-                                            @foreach($courses as $course)
-                                            <option value="{{$course->id}}">{{$course->title}}</option>
+                                            {{ Form::text('title', Session::get('title'), array('class' => 'form-control','maxlength'=>'255')) }}          
+                                        </div>
+
+                                        
+                                        <div class="form-group @if($errors->has('week_no')) has-error @endif">
+                                            <label>Week No.:</label>
+                                            @if($errors->has('week_no'))
+                                            <label class="control-label" for="inputError">{{ $errors->first('week_no') }}</label>
+                                            @endif
+                                            <select data-placeholder="Select week" style="width:350px;" class="chosen-select" tabindex="12" name="week_no">
+                                                <?php
+                                                $weekcount = Topic::where("course_id",$course->id)->groupBy('week_no')->orderBy('week_no', 'DESC')->first();
+    
+                                                ?>
+                                            <option select value="{{$weekcount->week_no+1}}">{{$weekcount->week_no+1}}</option>
+                                            @foreach($weeks as $week)
+                                            <option value="{{$week->week_no}}">{{$week->week_no}}</option>
                                             @endforeach
                                             </select>          
                                         </div>
-                                        <input type="hidden" name="program_id" value="{{$program->id}}">
+                                        <div class="form-group @if($errors->has('clo')) has-error @endif">
+                                            <label>Add Outcomes:</label>
+                                            @if($errors->has('clo'))
+                                            <label class="control-label" for="inputError">{{ $errors->first('clo') }}</label>
+                                            @endif
+                                            <select data-placeholder="Select course outcomes" style="width:350px;"  multiple class="chosen-select" tabindex="12" name="clo[]">
+                                            @foreach($courseoutcomes as $courseoutcome)
+                                            <option value="{{$courseoutcome->id}}">{{$courseoutcome->outcome}}</option>
+                                            @endforeach
+                                            </select>          
+                                        </div>
+                                        <input type="hidden" name="course_id" value="{{$course->id}}">
                                         <center>
                                         <button type="submit" class="btn btn-default">Add</button>
                                         </center>
@@ -101,7 +119,7 @@
     <div class="col-lg-6"> 
         <div class="panel panel-default">
             <div class="panel-heading">
-                {{$program->title}} Program Outcomes
+                {{$course->title}} Course Outcomes
             </div>
             <div class="panel-body">
                     <div class="dataTable_wrapper">
@@ -114,12 +132,13 @@
                                     </thead>
                                     <tbody>
 
-                                        @foreach($programoutcomes as $programoutcome)
+                                        @foreach($courseoutcomes as $courseoutcome)
                                         <tr class="gradeA">
-                                            <td class="center">{{$programoutcome->outcome}}</td>
+                                            <td class="center">{{$courseoutcome->outcome}}</td>
                                  
                                             <td class="center">
-                                                <button class="btn btn-warning" type="button" data-toggle="modal" data-target="{{ '#deleteoutcome_' . $programoutcome->id }}"  data-toggle="tooltip" data-placement="top"  title="Delete Outcome from Program" disabled><i class="fa fa-trash-o"></i></button>
+                                                
+                                                <button class="btn btn-warning" type="button" data-toggle="modal" data-target="{{ '#deleteoutcome_' . $courseoutcome->id }}"  data-toggle="tooltip" data-placement="top"  title="Delete Outcome from Course" disabled><i class="fa fa-trash-o"></i></button>
                                             </td>
                                         </tr>
                                         @endforeach
@@ -128,20 +147,20 @@
                                     </tbody>
                     </table>
                 </div>
-                {{ Form::open(['role'=>'form','type' => 'POST', 'url' => '/admin/programs/add/outcome', 'files' => true]) }}
+                 {{ Form::open(['role'=>'form','type' => 'POST', 'url' => '/admin/courses/add/outcome', 'files' => true]) }}
                                         
-                                        <div class="form-group @if($errors->has('title')) has-error @endif">
+                                        <div class="form-group @if($errors->has('outcome')) has-error @endif">
                                             <label>Add Outcome:</label>
-                                            @if($errors->has('title'))
-                                            <label class="control-label" for="inputError">{{ $errors->first('title') }}</label>
+                                            @if($errors->has('outcome'))
+                                            <label class="control-label" for="inputError">{{ $errors->first('outcome') }}</label>
                                             @endif
                                             {{ Form::text('outcome', Session::get('outcome'), array('class' => 'form-control','maxlength'=>'255')) }}          
                                         </div>
-                                        <input type="hidden" name="program_id" value="{{$program->id}}">
+                                        <input type="hidden" name="course_id" value="{{$course->id}}">
                                         <center>
                                         <button type="submit" class="btn btn-default">Add</button>
                                         </center>
-                {{ Form::close() }}
+                                        {{ Form::close() }}
             </div>
         </div>
 
@@ -153,15 +172,15 @@
 @stop
 @section('dialogs')
     
-    @foreach($progcours as $progcour)
+    @foreach($topics as $topic)
     <?php 
         $modalName = "delete";
-        $course = Course::find($progcour->course_id);
-        $message = "Are you sure you want to delete course {$course->title} form this program?";
+       
+        $message = "Are you sure you want to delete topic {$topic->title} ?";
 
     ?>
    
-    <div class="modal fade" id="{{ $modalName . '_' . $progcour->id }}" aria-hidden="true">
+    <div class="modal fade" id="{{ $modalName . '_' . $topic->id }}" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -173,21 +192,21 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn " data-dismiss="modal">Cancel</button>
-                    <a href="/admin/progcour/delete/{{$progcour->id}}" class="btn btn-warning" id="confirm">Delete </a>
+                    <a href="/admin/topics/delete/{{$topic->id}}" class="btn btn-warning" id="confirm">Delete </a>
                 </div>
             </div>
         </div>
     </div>         
     @endforeach
-    @foreach($programoutcomes as $programoutcome)
+    @foreach($courseoutcomes as $courseoutcome)
     <?php 
         $modalName = "deleteoutcome";
      
-        $message = "Are you sure you want to delete outcome for this program?";
+        $message = "Are you sure you want to delete outcome for this course?";
 
     ?>
    
-    <div class="modal fade" id="{{ $modalName . '_' . $programoutcome->id }}" aria-hidden="true">
+    <div class="modal fade" id="{{ $modalName . '_' . $courseoutcome->id }}" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -199,7 +218,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn " data-dismiss="modal">Cancel</button>
-                    <a href="/admin/program/outcome/delete/{{$programoutcome->id}}" class="btn btn-warning" id="confirm">Delete </a>
+                    <a href="/admin/courses/outcome/delete/{{$courseoutcome->id}}" class="btn btn-warning" id="confirm">Delete </a>
                 </div>
             </div>
         </div>

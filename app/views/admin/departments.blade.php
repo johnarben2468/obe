@@ -57,9 +57,9 @@
                                             <td class="center">{{$courses}}</td>
                                             <td class="center">
                                                 <a href="/admin/departments/edit/{{$department->id}}">
-                                                <button class="btn btn-primary" ><i class="fa fa-pencil-square-o"></i></button>
+                                                <button class="btn btn-primary" disabled><i class="fa fa-pencil-square-o"></i></button>
                                                 </a>  
-                                                <button class="btn btn-warning" type="button" data-toggle="modal" data-target="{{ '#delete_' . $department->id }}"  data-toggle="tooltip" data-placement="top"  title="Delete Department" @if($professors!=0&&$courses!=0) disable @endif ><i class="fa fa-trash-o"></i></button>
+                                                <button class="btn btn-warning" type="button" data-toggle="modal" data-target="{{ '#delete_' . $department->id }}"  data-toggle="tooltip" data-placement="top"  title="Delete Department" @if($professors!=0&&$courses!=0) disable @endif disabled><i class="fa fa-trash-o"></i></button>
                                             </td>
                                         </tr>
                                         @endforeach
@@ -132,7 +132,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <b style="color:white;">Delete Department</b>
+                    <b >Delete Department</b>
                 </div>
                 <div class="modal-body">
                     <font color="black">{{ $message }}</font>

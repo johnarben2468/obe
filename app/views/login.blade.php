@@ -43,6 +43,11 @@
                                 <button class="btn btn-lg btn-success btn-block">Login</button>
                             </fieldset>
                         {{ Form::close() }}
+
+                        <br>
+                        <footer>
+                            <p>Don't have an account yet? <a href="/register">Click here to register.</a></p>
+                        </footer>
                     </div>
                 </div>
             </div>

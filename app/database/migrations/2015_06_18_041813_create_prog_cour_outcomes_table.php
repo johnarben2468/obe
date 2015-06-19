@@ -14,6 +14,8 @@ class CreateProgCourOutcomesTable extends Migration {
 		Schema::create('prog_cour_outcomes', function(Blueprint $table)
 		{
 			$table->increments('id');
+
+			$table->integer('prog_cour_id');
 			$table->integer('course_outcome_id');
 			$table->integer('program_outcome_id');
 			$table->timestamps();

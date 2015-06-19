@@ -16,7 +16,7 @@ class CreateCoursesTable extends Migration {
 		{
 			$table->increments('id');
 			$table->string('title');
-			$table->text('descriptions');
+			$table->text('description');
 			$table->text('objectives');
 			$table->string('lec_code');
 			$table->string('lab_code');

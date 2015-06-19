@@ -46,13 +46,13 @@
                                     <tbody>
                                         @foreach($programs as $program)
                                         <tr class="gradeA">
-                                            <td class="center"><a href="/admin/program/view/{{$program->id}}">{{$program->title}}</a></td>
+                                            <td class="center"><a href="/admin/programs/view/{{$program->id}}">{{$program->title}}</a></td>
                                  
                                             <td class="center">
-                                                <a href="/admin/program/edit/{{$program->id}}">
-                                                <button class="btn btn-primary" ><i class="fa fa-pencil-square-o"></i></button>
+                                                <a href="/admin/programs/edit/{{$program->id}}">
+                                                <button class="btn btn-primary" disabled><i class="fa fa-pencil-square-o"></i></button>
                                                 </a>  
-                                                <button class="btn btn-warning" type="button" data-toggle="modal" data-target="{{ '#delete_' . $program->id }}"  data-toggle="tooltip" data-placement="top"  title="Delete Program" ><i class="fa fa-trash-o"></i></button>
+                                                <button class="btn btn-warning" type="button" data-toggle="modal" data-target="{{ '#delete_' . $program->id }}"  data-toggle="tooltip" data-placement="top"  title="Delete Program" disabled><i class="fa fa-trash-o"></i></button>
                                             </td>
                                         </tr>
                                         @endforeach
@@ -103,10 +103,10 @@
             <!-- /.row -->
 @stop
 @section('dialogs')
-    @foreach($programs as $program)
+   @foreach($programs as $program)
     <?php 
         $modalName = "delete";
-        $message = "Are you sure you want to delete program {$program->name} ?";
+        $message = "Are you sure you want to delete program {$program->title} ?";
     ?>
    
     <div class="modal fade" id="{{ $modalName . '_' . $program->id }}" aria-hidden="true">
